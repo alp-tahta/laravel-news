@@ -121,4 +121,15 @@ class NewsService
             'status' => 201
         ];
     }
+
+    /**
+     * Search news by text.
+     *
+     * @param string $query
+     * @return \Illuminate\Database\Eloquent\Collection
+     */
+    public function searchNews(string $query)
+    {
+        return \App\Models\News::where('text', 'like', "%{$query}%")->get();
+    }
 }

@@ -98,4 +98,23 @@ class NewsController extends Controller
             'message' => 'Haber başarıyla silindi.',
         ]);
     }
+
+    /**
+     * Search news by text.
+     */
+    public function search(Request $request)
+    {
+        $query = $request->input('q');
+        if (!$query) {
+            return response()->json([
+                'status' => 'error',
+                'message' => 'Arama sorgusu gerekli.',
+            ], 422);
+        }
+        $news = $this->newsService->searchNews($query);
+        return response()->json([
+            'status' => 'success',
+            'data' => \App\Http\Resources\NewsResource::collection($news),
+        ]);
+    }
 }
