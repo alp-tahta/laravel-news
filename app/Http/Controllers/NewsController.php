@@ -72,7 +72,7 @@ class NewsController extends Controller
         if (!$news) {
             return response()->json([
                 'status' => 'error',
-                'message' => 'News not found',
+                'message' => 'Haber bulunamadı.',
             ], 404);
         }
 
@@ -95,6 +95,13 @@ class NewsController extends Controller
      */
     public function destroy(string $id)
     {
-        //
+        $news = $this->newsService->findNewsById((int) $id);
+        if (!$news) {
+            return response()->json([
+                'status' => 'error',
+                'message' => 'Haber bulunamadı.',
+            ], 404);
+        }
+        $this->newsService->deleteNews((int) $id);
     }
 }
