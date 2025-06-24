@@ -15,6 +15,9 @@ class EnsureTokenIsValid
      */
     public function handle(Request $request, Closure $next): Response
     {
+        if ($request->method() === 'GET') {
+            return $next($request);
+        }
         $token = $request->header('Authorization');
         if ($token !== '2BH52wAHrAymR7wP3CASt') {
             return response()->json([
