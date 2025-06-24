@@ -80,7 +80,7 @@ class NewsService
         $data = json_decode($requestData['data'], true);
         if (json_last_error() !== JSON_ERROR_NONE) {
             return [
-                'error' => 'Invalid JSON in data field',
+                'error' => 'Geçersiz JSON veri yapısı.',
                 'status' => 422
             ];
         }
