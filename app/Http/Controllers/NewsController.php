@@ -32,11 +32,11 @@ class NewsController extends Controller
      */
     public function store(Request $request)
     {
-        // First, validate the presence and type of fields
+        // Validate the presence and type of fields
         try {
             $validated = $request->validate([
                 'data' => 'required|string',
-                'file' => 'required|file|mimes:jpg,jpeg,png,pdf,webp|max:48' // Max 2MB
+                'file' => 'required|file|mimes:webp|max:2048'
             ]);
         } catch (ValidationException $e) {
             return response()->json([
@@ -45,53 +45,20 @@ class NewsController extends Controller
             ], 422);
         }
 
-        // Decode JSON from the 'data' field
-        $data = json_decode($request->input('data'), true);
-        if (json_last_error() !== JSON_ERROR_NONE) {
-            return response()->json(['error' => 'Invalid JSON in data field'], 422);
-        }
+        $result = $this->newsService->handleNewsUpload($request->only('data'), $request->file('file'));
 
-        // Now validate the decoded JSON
-        $validator = Validator::make($data, [
-            'text' => 'required|string',
-            // add other fields as needed
-        ]);
-        if ($validator->fails()) {
+        if (isset($result['error'])) {
             return response()->json([
                 'status' => 'error',
-                'errors' => $validator->errors(),
-            ], 422);
+                'errors' => $result['error'],
+            ], $result['status']);
         }
 
-        // File and JSON are valid here
-        $file = $request->file('file');
-        $path = $file->store('uploads', 'public'); // Optional: save file
-
         return response()->json([
-            'message' => 'Upload successful',
-            'data' => $data,
-            'file_path' => $path
-        ]);
-
-        /*
-            try {
-                $validated = $request->validate([
-                    'text' => 'required|string|max:5',
-                    'image_webp' => 'required|string',
-                ]);
-            } catch (ValidationException $e) {
-                return response()->json([
-                    'status' => 'error',
-                    'errors' => $e->errors(),
-                ], 422);
-            }
-
-            $news = $this->newsService->createNews($validated);
-
-            return response()->json([
-                'status' => 'success',
-                'data' => new \App\Http\Resources\NewsResource($news),
-            ], 201); */
+            'status' => 'success',
+            'data' => new \App\Http\Resources\NewsResource($result['news']),
+            'file_path' => $result['file_path']
+        ], 201);
     }
 
 
