@@ -32,10 +32,17 @@ class NewsController extends Controller
      */
     public function store(Request $request)
     {
-        $validated = $request->validate([
-            'data' => 'required|string',
-            'file' => 'required|file|mimes:webp|max:2048',
-        ]);
+        try {
+            $validated = $request->validate([
+                'data' => 'required|string',
+                'file' => 'required|file|mimes:webp|max:2048',
+            ]);
+        } catch (ValidationException $e) {
+            return response()->json([
+                'status' => 'error',
+                'errors' => $e->errors(),
+            ], 422);
+        }
 
         $result = $this->newsService->handleNewsUpload($request->only('data'), $request->file('file'));
 
