@@ -32,7 +32,7 @@ class NewsController extends Controller
     {
         try {
             $validated = $request->validate([
-                'text' => 'required|string',
+                'text' => 'required|string|max:5',
                 'image_webp' => 'required|string',
             ]);
         } catch (ValidationException $e) {
