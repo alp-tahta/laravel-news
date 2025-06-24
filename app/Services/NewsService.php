@@ -2,6 +2,9 @@
 
 namespace App\Services;
 
+use Intervention\Image\ImageManager;
+use Intervention\Image\Drivers\Gd\Driver as GdDriver;
+
 class NewsService
 { 
     /**
@@ -98,8 +101,21 @@ class NewsService
             ];
         }
 
-        // File and JSON are valid here
-        $path = $file->store('uploads', 'public');
+        // Resize the image to 800x800 if it's a webp
+        $path = null;
+        if ($file->extension() === 'webp') {
+            $manager = new ImageManager(new GdDriver());
+            $image = $manager->read($file)
+                ->resize(800, 800)
+                ->cover(800, 800)
+                ->toWebp(90);
+            $filename = uniqid('news_', true) . '.webp';
+            $storagePath = storage_path('app/public/uploads/' . $filename);
+            $image->save($storagePath);
+            $path = 'uploads/' . $filename;
+        } else {
+            $path = $file->store('uploads', 'public');
+        }
 
         // Optionally, create the news item in the database
         $news = $this->createNews([
