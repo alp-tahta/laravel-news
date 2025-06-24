@@ -6,3 +6,4 @@ php artisan make:migration create_news_table
 
 ## Migrate tables
 php artisan migrate
+php artisan migrate:fresh
