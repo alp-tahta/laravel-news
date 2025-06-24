@@ -29,7 +29,17 @@ class NewsController extends Controller
      */
     public function store(Request $request)
     {
-        //
+        $validated = $request->validate([
+            'text' => 'required|string',
+            'image_webp' => 'required|string',
+        ]);
+
+        $news = $this->newsService->createNews($validated);
+
+        return response()->json([
+            'status' => 'success',
+            'data' => new \App\Http\Resources\NewsResource($news),
+        ], 201);
     }
 
     /**
@@ -37,7 +47,19 @@ class NewsController extends Controller
      */
     public function show(string $id)
     {
-        //
+        $news = $this->newsService->findNewsById((int)$id);
+
+        if (!$news) {
+            return response()->json([
+                'status' => 'error',
+                'message' => 'News not found',
+            ], 404);
+        }
+
+        return response()->json([
+            'status' => 'success',
+            'data' => new \App\Http\Resources\NewsResource($news),
+        ]);
     }
 
     /**
