@@ -1,6 +1,16 @@
 docker run --name postgres -e POSTGRES_PASSWORD=mypassword -e POSTGRES_USER=myuser -e POSTGRES_DB=laravel_news -p 5432:5432 -v postgres-data:/var/lib/postgresql/data -d postgres
 docker exec -it postgres psql -U myuser -d laravel_news
 
+php artisan make:model News
+
+php artisan make:controller NewsController --api
+
+php artisan make:request News/StoreRequest
+
+php artisan make:resource NewsResource
+
+php artisan install:api
+
 ## Migrate news table
 php artisan make:migration create_news_table
 
