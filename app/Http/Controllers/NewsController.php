@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
 use App\Services\NewsService;
+use Illuminate\Validation\ValidationException;
 
 class NewsController extends Controller
 {
@@ -29,10 +30,17 @@ class NewsController extends Controller
      */
     public function store(Request $request)
     {
-        $validated = $request->validate([
-            'text' => 'required|string',
-            'image_webp' => 'required|string',
-        ]);
+        try {
+            $validated = $request->validate([
+                'text' => 'required|string',
+                'image_webp' => 'required|string',
+            ]);
+        } catch (ValidationException $e) {
+            return response()->json([
+                'status' => 'error',
+                'errors' => $e->errors(),
+            ], 422);
+        }
 
         $news = $this->newsService->createNews($validated);
 
