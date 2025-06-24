@@ -60,15 +60,12 @@ class NewsService
      * Delete a news item.
      *
      * @param int $id
-     * @return bool|null
+     * @return bool
      */
     public function deleteNews(int $id)
     {
         $news = $this->findNewsById($id);
-        if ($news) {
-            return $news->delete();
-        }
-        return null;
+        return $news ? $news->delete() : false;
     }
 
     /**
@@ -80,7 +77,6 @@ class NewsService
      */
     public function handleNewsUpload(array $requestData, $file)
     {
-        // Decode JSON from the 'data' field
         $data = json_decode($requestData['data'], true);
         if (json_last_error() !== JSON_ERROR_NONE) {
             return [
@@ -89,10 +85,8 @@ class NewsService
             ];
         }
 
-        // Validate the decoded JSON
         $validator = \Validator::make($data, [
             'text' => 'required|string',
-            // add other fields as needed
         ]);
         if ($validator->fails()) {
             return [
@@ -101,7 +95,6 @@ class NewsService
             ];
         }
 
-        // Resize the image to 800x800 if it's a webp
         $path = null;
         if ($file->extension() === 'webp') {
             $manager = new ImageManager(new GdDriver());
@@ -117,7 +110,6 @@ class NewsService
             $path = $file->store('uploads', 'public');
         }
 
-        // Optionally, create the news item in the database
         $news = $this->createNews([
             'text' => $data['text'],
             'image_webp' => $path,

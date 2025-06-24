@@ -32,18 +32,10 @@ class NewsController extends Controller
      */
     public function store(Request $request)
     {
-        // Validate the presence and type of fields
-        try {
-            $validated = $request->validate([
-                'data' => 'required|string',
-                'file' => 'required|file|mimes:webp|max:2048'
-            ]);
-        } catch (ValidationException $e) {
-            return response()->json([
-                'status' => 'error',
-                'errors' => $e->errors(),
-            ], 422);
-        }
+        $validated = $request->validate([
+            'data' => 'required|string',
+            'file' => 'required|file|mimes:webp|max:2048',
+        ]);
 
         $result = $this->newsService->handleNewsUpload($request->only('data'), $request->file('file'));
 
@@ -57,10 +49,9 @@ class NewsController extends Controller
         return response()->json([
             'status' => 'success',
             'data' => new \App\Http\Resources\NewsResource($result['news']),
-            'file_path' => $result['file_path']
+            'file_path' => $result['file_path'],
         ], 201);
     }
-
 
     /**
      * Display the specified resource.
@@ -83,14 +74,6 @@ class NewsController extends Controller
     }
 
     /**
-     * Update the specified resource in storage.
-     */
-    public function update(Request $request, string $id)
-    {
-        //
-    }
-
-    /**
      * Remove the specified resource from storage.
      */
     public function destroy(string $id)
@@ -103,5 +86,9 @@ class NewsController extends Controller
             ], 404);
         }
         $this->newsService->deleteNews((int) $id);
+        return response()->json([
+            'status' => 'success',
+            'message' => 'Haber başarıyla silindi.',
+        ]);
     }
 }
