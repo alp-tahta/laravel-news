@@ -27,9 +27,9 @@ class RateLimitOrBlockMiddleware
         // If no token, count attempts and blacklist after 10
         if (!$token) {
             $attempts = Cache::get($rateKey, 0) + 1;
-            Cache::put($rateKey, $attempts, 5); // 10 dakika pencere
+            Cache::put($rateKey, $attempts, 600); // 10 dakika pencere
             if ($attempts > 10) {
-                Cache::put($blockKey, true, 5); // 10 dakika blacklist
+                Cache::put($blockKey, true, 600); // 10 dakika blacklist
                 return response()->json([
                     'status' => 'error',
                     'message' => 'IP adresiniz çok fazla istekte bulunduğu için 10 dakika boyunca engellendi.'
